@@ -1,7 +1,0 @@
-﻿  SimpleGame.cpp
-C:\Users\C221-16\Downloads\BaseProject\SimpleGame\SimpleGame.cpp(81,35): warning C4138: '*/'가 주석 외부에 있습니다.
-  (소스 파일 '/SimpleGame.cpp'을(를) 컴파일하는 중)
-  
-C:\Users\C221-16\Downloads\BaseProject\SimpleGame\SimpleGame.cpp(81,36): error C2059: 구문 오류: '/'
-  (소스 파일 '/SimpleGame.cpp'을(를) 컴파일하는 중)
-  
