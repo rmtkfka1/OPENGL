@@ -23,6 +23,10 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Create VBOs
 	CreateVertexBufferObjects();
 
+	glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
+	glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
+	glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
+
 	if (m_SolidRectShader > 0 && m_VBORect > 0)
 	{
 		m_Initialized = true;
@@ -46,6 +50,24 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBORect);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+
+
+	{
+		float rect[]=
+		{
+			0,0,0,
+			1.f , 0.f , 0.f, 
+			1.f , 1.f , 0.f, //Test
+		};
+
+		//Lecture2
+	
+		glGenBuffers(1, &m_VBOTest);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+	}
+
+
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -187,6 +209,25 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 	glDisableVertexAttribArray(attribPosition);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::DrawTestRect()
+{
+	glUseProgram(m_SolidRectShader);
+
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), 0, 0, 0, 30);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1, 1, 1, 1);
+
+
+
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableVertexAttribArray(attribPosition);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)

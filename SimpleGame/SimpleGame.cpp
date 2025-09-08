@@ -12,7 +12,6 @@ but WITHOUT ANY WARRANTY.
 #include <iostream>
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
-
 #include "Renderer.h"
 
 Renderer *g_Renderer = NULL;
@@ -23,7 +22,8 @@ void RenderScene(void)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 
 	// Renderer Test
-	g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
+	//g_Renderer->DrawSolidRect(0, 0, 0, 300, 1, 1, 1, 1);
+	g_Renderer->DrawTestRect();
 
 	glutSwapBuffers();
 }
@@ -79,7 +79,6 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(KeyInput);
 	glutMouseFunc(MouseInput);
 	glutSpecialFunc(SpecialKeyInput);
-
 	glutMainLoop();
 
 	delete g_Renderer;
