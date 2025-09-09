@@ -23,14 +23,13 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Create VBOs
 	CreateVertexBufferObjects();
 
-	glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
-	glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
-	glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
+	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
+	//glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
+	//glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
 
-	if (m_SolidRectShader > 0 && m_VBORect > 0)
-	{
-		m_Initialized = true;
-	}
+	
+	m_Initialized = true;
+	
 }
 
 bool Renderer::IsInitialized()
@@ -40,31 +39,46 @@ bool Renderer::IsInitialized()
 
 void Renderer::CreateVertexBufferObjects()
 {
-	float rect[]
-		=
+	//float rect[]
+	//	=
+	//{
+	//	-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, -1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, //Triangle1
+	//	-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f,  1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, //Triangle2
+	//};
+
+	//glGenBuffers(1, &m_VBORect);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+
+
 	{
-		-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, -1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, //Triangle1
-		-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f,  1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, //Triangle2
-	};
-
-	glGenBuffers(1, &m_VBORect);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
-
-
-	{
-		float rect[]=
 		{
-			0,0,0,
-			1.f , 0.f , 0.f, 
-			1.f , 1.f , 0.f, //Test
-		};
+			float rect[] =
+			{
+				0   , 0.f,  0.f,
+				1.f , 0.f , 0.f,
+				1.f , 1.f , 0.f, //Test
+			};
 
-		//Lecture2
-	
-		glGenBuffers(1, &m_VBOTest);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+			glGenBuffers(1, &m_VBOTestPos);
+			glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestPos);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+		}
+
+		{
+			float color[] =
+			{
+				1.0f,0.0f,0.0f,1.0f,
+				0.0f,1.0f,0.0f,1.0f,
+				0.0f,0.0f,1.0f,1.0f
+			};
+
+
+			glGenBuffers(1, &m_VBOTestColor);
+			glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestColor);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+		}
+
 	}
 
 
@@ -189,44 +203,56 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a)
 {
-	float newX, newY;
+	//float newX, newY;
 
-	GetGLPosition(x, y, &newX, &newY);
+	//GetGLPosition(x, y, &newX, &newY);
 
-	//Program select
-	glUseProgram(m_SolidRectShader);
+	////Program select
+	//glUseProgram(m_SolidRectShader);
 
-	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, 0, size);
-	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), r, g, b, a);
+	//glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, 0, size);
+	//glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), r, g, b, a);
 
-	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	//int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	//glEnableVertexAttribArray(attribPosition);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
+	//glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glDisableVertexAttribArray(attribPosition);
+	//glDisableVertexAttribArray(attribPosition);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::DrawTestRect()
 {
 	glUseProgram(m_SolidRectShader);
 
+	// Set uniforms
 	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), 0, 0, 0, 30);
 	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1, 1, 1, 1);
 
-
-
+	// Bind position attribute
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
 	glEnableVertexAttribArray(attribPosition);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTest);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestPos);
 	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	// Bind color attribute
+	int attribColor = glGetAttribLocation(m_SolidRectShader, "a_Color");
+	glEnableVertexAttribArray(attribColor);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestColor);
+	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+
+	// Draw 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	// Cleanup
 	glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(attribColor);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 }
 
