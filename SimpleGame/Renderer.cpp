@@ -230,8 +230,8 @@ void Renderer::DrawTestRect()
 	glUseProgram(m_SolidRectShader);
 
 	// Set uniforms
-	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), 0, 0, 0, 30);
-	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1, 1, 1, 1);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), 0, 0, 0, 1.0f);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Bind position attribute
 	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
