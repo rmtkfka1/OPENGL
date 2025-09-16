@@ -12,3 +12,5 @@
 *.suo 
 *.db 
 
+x64/Debug/SimpleGame.pdb
+x64/Debug/SimpleGame.exe

@@ -203,26 +203,26 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 
 void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a)
 {
-	//float newX, newY;
+	float newX, newY;
 
-	//GetGLPosition(x, y, &newX, &newY);
+	GetGLPosition(x, y, &newX, &newY);
 
-	////Program select
-	//glUseProgram(m_SolidRectShader);
+	//Program select
+	glUseProgram(m_SolidRectShader);
 
-	//glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, 0, size);
-	//glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), r, g, b, a);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), newX, newY, 0, size);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), r, g, b, a);
 
-	//int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	//glEnableVertexAttribArray(attribPosition);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	//glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestPos);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	//glDisableVertexAttribArray(attribPosition);
+	glDisableVertexAttribArray(attribPosition);
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::DrawTestRect()
