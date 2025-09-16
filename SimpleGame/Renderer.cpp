@@ -245,6 +245,12 @@ void Renderer::DrawTestRect()
 
 	glUseProgram(ShaderName);
 
+	m_time += 0.016f;
+	
+	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
+	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
+	
+
 	// Bind position attribute
 	int attribPosition = glGetAttribLocation(ShaderName, "a_Position");
 	glEnableVertexAttribArray(attribPosition);

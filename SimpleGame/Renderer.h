@@ -38,5 +38,8 @@ private:
 	//Lecture2
 	GLuint m_VBOTestPos=0;
 	GLuint m_VBOTestColor = 0;
+
+
+	float m_time = 0;
 };
 
