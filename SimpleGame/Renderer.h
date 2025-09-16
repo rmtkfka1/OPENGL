@@ -33,6 +33,7 @@ private:
 	
 
 	GLuint m_SolidRectShader = 0;
+	GLuint m_TestShader = 0;
 
 	//Lecture2
 	GLuint m_VBOTestPos=0;
