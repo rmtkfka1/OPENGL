@@ -20,7 +20,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//Load shaders
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
 	m_TestShader = CompileShaders("./Shaders/SolidRectTest.vs", "./Shaders/SolidRectTest.fs");
-
+	m_ParticleShader = CompileShaders("./Shaders/Particle.vs", "./Shaders/Particle.fs");
 	//Create VBOs
 	CreateVertexBufferObjects();
 
@@ -58,12 +58,19 @@ void Renderer::CreateVertexBufferObjects()
 			float size = 0.1f;
 			float rect[] =
 			{
-				(0 - temp) * size  , (0.f - temp) * size , (0.f - temp) * size,
-				(1.f - temp) * size, (0.f - temp) * size, (0.f - temp) * size,
-				(1.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size, //Test
-				(0.f - temp) * size, (0.f - temp) * size, (0.f - temp) * size,
-				(1.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size,
-				(0.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size
+				(0 - temp) * size  , (0.f - temp) * size , (0.f - temp) * size, 0.5f,
+				(1.f - temp) * size, (0.f - temp) * size, (0.f - temp) * size, 0.5f,
+				(1.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size, 0.5f,
+				(0.f - temp) * size, (0.f - temp) * size, (0.f - temp) * size, 0.5f,
+				(1.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size, 0.5f,
+				(0.f - temp) * size, (1.f - temp) * size, (0.f - temp) * size, 0.5f,
+
+				(0 - temp)* size  , (0.f - temp)* size , (0.f - temp)* size, 1.0f,
+				(1.f - temp)* size, (0.f - temp)* size, (0.f - temp)* size, 1.0f,
+				(1.f - temp)* size, (1.f - temp)* size, (0.f - temp)* size, 1.0f,
+				(0.f - temp)* size, (0.f - temp)* size, (0.f - temp)* size, 1.0f,
+				(1.f - temp)* size, (1.f - temp)* size, (0.f - temp)* size, 1.0f,
+				(0.f - temp)* size, (1.f - temp)* size, (0.f - temp)* size, 1.0f
 			};
 
 			glGenBuffers(1, &m_VBOTestPos);
@@ -74,6 +81,14 @@ void Renderer::CreateVertexBufferObjects()
 		{
 			float color[] =
 			{
+				1.0f,0.0f,0.0f,1.0f,
+				0.0f,1.0f,0.0f,1.0f,
+				0.0f,0.0f,1.0f,1.0f, //Triangle1
+				1.0f,0.0f,0.0f,1.0f,
+				0.0f,1.0f,0.0f,1.0f,
+				0.0f,0.0f,1.0f,1.0f,  //Triangle2
+
+
 				1.0f,0.0f,0.0f,1.0f,
 				0.0f,1.0f,0.0f,1.0f,
 				0.0f,0.0f,1.0f,1.0f, //Triangle1
@@ -241,7 +256,7 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 void Renderer::DrawTestRect()
 {
 
-#define ShaderName m_TestShader
+#define ShaderName m_ParticleShader
 
 	glUseProgram(ShaderName);
 
@@ -255,7 +270,15 @@ void Renderer::DrawTestRect()
 	int attribPosition = glGetAttribLocation(ShaderName, "a_Position");
 	glEnableVertexAttribArray(attribPosition);
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestPos);
-	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
+
+	
+	int attribRadius = glGetAttribLocation(ShaderName, "a_Radius");
+	glEnableVertexAttribArray(attribRadius);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOTestPos);
+	glVertexAttribPointer(attribRadius, 1, GL_FLOAT, GL_FALSE, sizeof(float)*4 , (GLvoid*)(sizeof(float)*3));
+	
+
 
 	// Bind color attribute
 	int attribColor = glGetAttribLocation(ShaderName, "a_Color");
@@ -264,7 +287,7 @@ void Renderer::DrawTestRect()
 	glVertexAttribPointer(attribColor, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 4, 0);
 
 	// Draw 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArrays(GL_TRIANGLES, 0, 12);
 
 	// Cleanup
 	glDisableVertexAttribArray(attribPosition);
