@@ -17,11 +17,6 @@ void main()
 	newPosition.x += a_Radius * cos(u_Time*pi);
 	newPosition.y += a_Radius * sin(u_Time*pi);
 
-	//float value = 2*fract(u_Time*0.5f)-1.0f; //-1 ~1 
-	//float rad = (value+1)*pi; // 0~ÆÄÀÌ
-	//newPosition.x += cos(rad) * a_Radius;
-	//newPosition.y += sin(rad) * a_Radius;
-
 	v_Color = a_Color;
 	gl_Position = newPosition;
 }
