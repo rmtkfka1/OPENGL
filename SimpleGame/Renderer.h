@@ -14,6 +14,9 @@ public:
 	~Renderer();
 
 	bool IsInitialized();
+	void ReloadAllShaders();
+	void CompileAllShaders();
+	void DeleteAllShaders();
 	void DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a);
 	void DrawTestRect();
 	void DrawParticle();
