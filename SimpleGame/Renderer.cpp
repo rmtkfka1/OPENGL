@@ -326,7 +326,7 @@ void Renderer::DrawParticle()
 
 	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
-	glUniform3f(glGetUniformLocation(ShaderName, "u_Force"), 1, 0, 0);
+	glUniform3f(glGetUniformLocation(ShaderName, "u_Force"), 5, 0, 0);
 
 	int stride = sizeof(float) * 14;
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);

@@ -38,7 +38,7 @@ void main()
 		float x =  (a_Vel.x * t) + (0.5 * ax * tt);
 		float y =  (a_Vel.y * t) + (0.5 * ay * tt);
 
-		newPosition.xy += vec2(0,0);
+		newPosition.xy += vec2(x,y);
 		newAlpha = 1-t/lifeTime;
 	}
 	else
