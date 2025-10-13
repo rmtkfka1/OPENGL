@@ -19,13 +19,13 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	CompileAllShaders();
 	CreateVertexBufferObjects();
-	CreateGridMesh(2,2);
+	CreateGridMesh(50,50);
 	GenerateParticles(2000'0);
 
 	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
 	//glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
 	//glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	m_Initialized = true;
 	
 }
@@ -309,8 +309,6 @@ void Renderer::DrawTestRect()
 	glDisableVertexAttribArray(attribPosition);
 	glDisableVertexAttribArray(attribColor);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
 }
 
 
@@ -532,6 +530,10 @@ void Renderer::DrawWave()
 	
 	//Program select
 	const int shaderInt = m_GridMeshShader;
+
+	m_time += 0.016f;
+
+	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
 
 	glUseProgram(shaderInt);
 	int attribPosition = glGetAttribLocation(shaderInt, "a_Position");
