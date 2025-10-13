@@ -102,17 +102,10 @@ void CircleParticle()
 		float x = sin(a_Value*2*pi);
 		float y = cos(a_Value*2*pi);
 
-
-		//s=s0​+v0​t+21​at2
-
 		float newX = x + 0.5 * 0 * tt;
 		float newY = y + 0.5 *c_G  * tt;
-		newPosition.xy += vec2(newX,newY); // 파티클의 원 계산
-
+		newPosition.xy += vec2(newX,newY); 
 		newAlpha = 1-t/lifeTime;
-
-
-	
 	} 
 	else
 	{
