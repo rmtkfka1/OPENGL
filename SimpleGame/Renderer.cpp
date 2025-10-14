@@ -20,7 +20,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	CompileAllShaders();
 	CreateVertexBufferObjects();
 	CreateGridMesh(50,50);
-	GenerateParticles(2000'0);
+	GenerateParticles(1000);
 
 	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
 	//glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
@@ -47,6 +47,8 @@ void Renderer::CompileAllShaders()
 	m_TestShader = CompileShaders("./Shaders/SolidRectTest.vs", "./Shaders/SolidRectTest.fs");
 	m_ParticleShader = CompileShaders("./Shaders/Particle.vs", "./Shaders/Particle.fs");
 	m_GridMeshShader = CompileShaders("./Shaders/GridMesh.vs", "./Shaders/GridMesh.fs");
+	m_FullScreenShader = CompileShaders("./Shaders/FullScreen.vs", "./Shaders/FullScreen.fs");
+
 }
 
 void Renderer::DeleteAllShaders()
@@ -55,6 +57,7 @@ void Renderer::DeleteAllShaders()
 	glDeleteShader(m_TestShader);
 	glDeleteShader(m_ParticleShader);
 	glDeleteShader(m_GridMeshShader);
+	glDeleteShader(m_FullScreenShader);
 }
 
 void Renderer::CreateVertexBufferObjects()
@@ -126,6 +129,16 @@ void Renderer::CreateVertexBufferObjects()
 
 
 
+	float fullRect[]
+		=
+	{
+		-1.f , -1.f , 0.f, -1.f , 1.f , 0.f, 1.f , 1.f , 0.f, //Triangle1
+		-1.f , -1.f , 0.f,  1.f , 1.f , 0.f, 1.f , -1.f , 0.f, //Triangle2
+	};
+
+	glGenBuffers(1, &m_VBOFullScreen);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFullScreen);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fullRect), fullRect, GL_STATIC_DRAW);
 
 
 
@@ -279,7 +292,7 @@ void Renderer::DrawTestRect()
 
 	glUseProgram(ShaderName);
 
-	m_time += 0.016f;
+
 	
 	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
@@ -471,7 +484,7 @@ void Renderer::DrawParticle()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	m_time += 0.016f;
+
 
 	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
@@ -530,12 +543,11 @@ void Renderer::DrawWave()
 	
 	//Program select
 	const int shaderInt = m_GridMeshShader;
-
-	m_time += 0.016f;
-
-	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
-
 	glUseProgram(shaderInt);
+
+
+	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
+
 	int attribPosition = glGetAttribLocation(shaderInt, "a_Position");
 	glEnableVertexAttribArray(attribPosition);
 	glBindBuffer(GL_ARRAY_BUFFER, m_GridMeshVBO);
@@ -545,7 +557,28 @@ void Renderer::DrawWave()
 	glDisableVertexAttribArray(attribPosition);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+}
 
+void Renderer::DrawFullScreenColor(float r, float g, float b, float a)
+{
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	int shader = m_FullScreenShader;
+	glUseProgram(shader);
+
+	glUniform4f(glGetUniformLocation(shader, "u_Color"), r, g, b, a);
+
+	int attribPosition = glGetAttribLocation(shader, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFullScreen);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDisableVertexAttribArray(attribPosition);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDisable(GL_BLEND);
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)

@@ -4,11 +4,10 @@ in vec3 a_Position;
 in vec4 a_Color;
 
 out vec4 v_Color;
-
 uniform float u_Time;
 const float pi = 3.141592;
 
-void main()
+void Flag()
 {
 	vec4 newPosition =  vec4(a_Position,1);
 	float Value = newPosition.x +0.5f; // 0 ~ 1f;
@@ -22,4 +21,26 @@ void main()
 	gl_Position = newPosition;
 
 	v_Color = vec4(newColor);
+}
+
+void Wave()
+{
+	vec4 newPosition =  vec4(a_Position,1);
+
+	float dx =0;
+	float dy =0;
+
+	vec2 pos = vec2(a_Position.xy);
+	vec2 cen = vec2(0,0);
+	float dist = distance(pos,cen);
+	float v = 2* clamp(0.5 -dist,0,1);
+	float newColor = v * sin(dist*20*pi- 30.0f * u_Time ) ;
+	gl_Position = newPosition;
+	v_Color = vec4(newColor);
+
+}
+
+void main()
+{
+	Wave();
 }
