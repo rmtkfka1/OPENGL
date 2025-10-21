@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Renderer.h"
-
+#include <vector>
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
@@ -19,7 +19,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	CompileAllShaders();
 	CreateVertexBufferObjects();
-	CreateGridMesh(50,50);
+	CreateGridMesh(1000,1000);
 	GenerateParticles(1000);
 
 	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
@@ -27,6 +27,21 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	//glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	m_Initialized = true;
+
+
+	int index = 0;
+	for (int i = 0; i < 100; ++i)
+	{	
+		float x = 2*  ((float)rand() / (float)RAND_MAX)- 1.0f;
+		float y = 2 * ((float)rand() / (float)RAND_MAX) - 1.0f;
+		float startTime = 10* ((float)rand() / (float)RAND_MAX);
+		float lifeTime = ((float)rand() / (float)RAND_MAX);
+
+		m_points[index] = x;		 index++;
+		m_points[index] = y;		 index++;
+		m_points[index] = startTime; index++;
+		m_points[index] = lifeTime;  index++;
+	}
 	
 }
 
@@ -329,13 +344,13 @@ void Renderer::CreateGridMesh(int x, int y)
 
 {
 
-	float basePosX = -0.5f;
+	float basePosX = -1.0f;
 
-	float basePosY = -0.5f;
+	float basePosY = -1.0f;
 
-	float targetPosX = 0.5f;
+	float targetPosX = 1.0f;
 
-	float targetPosY = 0.5f;
+	float targetPosY = 1.0f;
 
 	int pointCountX = x;
 
@@ -375,11 +390,8 @@ void Renderer::CreateGridMesh(int x, int y)
 	int vertIndex = 0;
 
 	for (int x = 0; x < pointCountX - 1; x++)
-
 	{
-
 		for (int y = 0; y < pointCountY - 1; y++)
-
 		{
 
 			//Triangle part 1
@@ -484,8 +496,6 @@ void Renderer::DrawParticle()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-
 	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
 	glUniform3f(glGetUniformLocation(ShaderName, "u_Force"), 5, 0, 0);
@@ -545,7 +555,7 @@ void Renderer::DrawWave()
 	const int shaderInt = m_GridMeshShader;
 	glUseProgram(shaderInt);
 
-
+	glUniform4fv(glGetUniformLocation(shaderInt, "u_Points"),100, m_points);
 	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
 
 	int attribPosition = glGetAttribLocation(shaderInt, "a_Position");
