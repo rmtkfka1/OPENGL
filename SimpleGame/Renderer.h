@@ -21,6 +21,7 @@ public:
 	void DrawTestRect();
 	void DrawParticle();
 	void DrawWave();
+	void DrawFs();
 	void DrawFullScreenColor(float r, float g, float b, float a);
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -64,6 +65,10 @@ private:
 	//Full Screen 
 	GLuint m_VBOFullScreen = 0;
 	GLuint m_FullScreenShader = 0;
+
+	//For Fragmentshader
+	GLuint m_VBOFS = 0;
+	GLuint m_FSShader = 0;
 
 	float m_points[100*4];
 

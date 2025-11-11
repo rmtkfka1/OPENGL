@@ -63,6 +63,7 @@ void Renderer::CompileAllShaders()
 	m_ParticleShader = CompileShaders("./Shaders/Particle.vs", "./Shaders/Particle.fs");
 	m_GridMeshShader = CompileShaders("./Shaders/GridMesh.vs", "./Shaders/GridMesh.fs");
 	m_FullScreenShader = CompileShaders("./Shaders/FullScreen.vs", "./Shaders/FullScreen.fs");
+	m_FSShader = CompileShaders("./Shaders/Fs.vs", "./Shaders/Fs.fs");
 
 }
 
@@ -73,6 +74,7 @@ void Renderer::DeleteAllShaders()
 	glDeleteShader(m_ParticleShader);
 	glDeleteShader(m_GridMeshShader);
 	glDeleteShader(m_FullScreenShader);
+	glDeleteShader(m_FSShader);
 }
 
 void Renderer::CreateVertexBufferObjects()
@@ -155,6 +157,24 @@ void Renderer::CreateVertexBufferObjects()
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFullScreen);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(fullRect), fullRect, GL_STATIC_DRAW);
 
+
+
+	{
+		float fullRect[]
+			=
+		{
+			-1.f , -1.f , 0.f,
+			-1.f ,1.f , 0.f, 
+			1.f , 1.f , 0.f, //Triangle1
+			-1.f , -1.f , 0.f, 
+			1.f , 1.f , 0.f,
+			1.f , -1.f , 0.f, //Triangle2
+		};
+
+		glGenBuffers(1, &m_VBOFS);
+		glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(fullRect), fullRect, GL_STATIC_DRAW);
+	}
 
 
 }
@@ -567,6 +587,24 @@ void Renderer::DrawWave()
 	glDisableVertexAttribArray(attribPosition);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+}
+
+void Renderer::DrawFs()
+{
+	const int shaderInt = m_FSShader;
+	glUseProgram(shaderInt);
+
+	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
+
+	int attribPosition = glGetAttribLocation(shaderInt, "a_Position");
+	glEnableVertexAttribArray(attribPosition);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBOFS);
+	glVertexAttribPointer(attribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glDisableVertexAttribArray(attribPosition);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::DrawFullScreenColor(float r, float g, float b, float a)
