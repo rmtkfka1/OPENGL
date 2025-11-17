@@ -78,6 +78,8 @@ private:
 
 	float m_points[100*4];
 
+	GLuint wave_texure{};
+
 	
 };
 

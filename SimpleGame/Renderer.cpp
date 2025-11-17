@@ -604,6 +604,12 @@ void Renderer::DrawWave()
 	const int shaderInt = m_GridMeshShader;
 	glUseProgram(shaderInt);
 
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(shaderInt, "u_Texture"), 0);
+	glBindTexture(GL_TEXTURE_2D, m_RGBTexture);
+
+
+
 	glUniform4fv(glGetUniformLocation(shaderInt, "u_Points"),100, m_points);
 	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
 
