@@ -1,8 +1,9 @@
 #version 330
 in vec3 a_Position;
 in vec2 v_UV;
-uniform float u_Time;
 
+uniform sampler2D u_RGBTexture;
+uniform float u_Time;
 layout(location=0) out vec4 FragColor;
 
 //void main()
@@ -27,29 +28,12 @@ layout(location=0) out vec4 FragColor;
 
 void main()
 {
-    // UV -> 중심 기준
-    vec2 uv = v_UV * 2.0 - 1.0;
-    float r = length(uv);
+    vec2 newUV = v_UV;
+    float dx =0;
+    float dy =u_Time;
+    newUV += vec2(dx,dy);
+    vec4 sampleColor = texture(u_RGBTexture,newUV);
+    FragColor =sampleColor;
 
-    // 반복 주기
-    float period = 2.0;
-    float t = mod(u_Time, period); // 반복되는 시간 (0 ~ period)
 
-    // 파동 파라미터
-    float speed = 1.5;
-    float frequency = 15.0;
-    float damping = 6.0;
-
-    // 중심에서 퍼지는 물방울
-    float wave = sin(frequency * (r - speed * t));
-
-    // 파동 감쇠 (r과 t 합쳐서 항상 반복 가능)
-    wave *= exp(-damping * pow(r - speed * t, 2.0));
-
-    // 중심 밝기 강조
-    float glow = 1.0 / (0.02 + r * r);
-
-    vec3 color = vec3(0.0, 0.7, 1.0) * (0.5 + 0.5 * wave) * glow;
-
-    FragColor = vec4(color, 1.0);
 }

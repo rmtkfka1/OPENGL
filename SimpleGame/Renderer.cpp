@@ -623,6 +623,10 @@ void Renderer::DrawFs()
 	const int shaderInt = m_FSShader;
 	glUseProgram(shaderInt);
 
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(shaderInt, "u_RGBTexture"), 0);
+	glBindTexture(GL_TEXTURE_2D, m_RGBTexture);
+
 	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
 
 	int attribPosition = glGetAttribLocation(shaderInt, "a_Position");
