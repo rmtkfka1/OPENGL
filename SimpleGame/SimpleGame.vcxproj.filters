@@ -71,7 +71,13 @@
       <Filter>소스 파일\Shaders</Filter>
     </None>
     <None Include="Shaders\SolidRectTest.vs">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Fs.fs">
+      <Filter>소스 파일\Shaders</Filter>
+    </None>
+    <None Include="Shaders\Fs.vs">
+      <Filter>소스 파일\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
