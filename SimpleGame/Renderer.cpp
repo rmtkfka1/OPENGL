@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Renderer.h"
 #include <vector>
+#include "LoadPng.h"
+#include <assert.h>
+
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
@@ -21,6 +24,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	CreateVertexBufferObjects();
 	CreateGridMesh(1000,1000);
 	GenerateParticles(1000);
+	m_RGBTexture = CreatePngTexture("./rgb.png", GL_NEAREST);
 
 	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
 	//glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
@@ -482,6 +486,31 @@ void Renderer::CreateGridMesh(int x, int y)
 
 	delete[] point;
 	delete[] vertices;
+}
+
+GLuint Renderer::CreatePngTexture(char* filePath, GLuint samplingMethod)
+{
+	//Load Png
+	std::vector<unsigned char> image;
+	unsigned width, height;
+	unsigned error = lodepng::decode(image, width, height, filePath);
+	if (error != 0)
+	{
+		std::cout << "PNG image loading failed:" << filePath << std::endl;
+		assert(0);
+	}
+
+	GLuint temp;
+	glGenTextures(1, &temp);
+	glBindTexture(GL_TEXTURE_2D, temp);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, &image[0]);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, samplingMethod);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, samplingMethod);
+
+	return temp;
+
 }
 
 

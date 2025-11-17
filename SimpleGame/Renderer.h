@@ -32,6 +32,11 @@ private:
 	void GenerateParticles(int numParticle);
 	void CreateGridMesh(int x, int y);
 
+
+	GLuint CreatePngTexture(char* filePath, GLuint samplingMethod);
+
+	GLuint m_RGBTexture{};
+
 	bool m_Initialized = false;
 	
 	unsigned int m_WindowSizeX = 0;
