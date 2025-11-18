@@ -29,9 +29,6 @@ void RenderScene(void)
 
 
 	glClear(GL_COLOR_BUFFER_BIT);
-	/*g_Renderer->DrawFullScreenColor(0, 0, 0, 0.3f);*/
-
-
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -40,8 +37,8 @@ void RenderScene(void)
 	//g_Renderer->DrawSolidRect(0, 0, 0, 300, 1, 1, 1, 1);
 	//g_Renderer->DrawTestRect();
 	//g_Renderer->DrawParticle();
-	g_Renderer->DrawWave();
-	//g_Renderer->DrawFs();
+	//g_Renderer->DrawWave();
+	g_Renderer->DrawFs();
 
 
 	glutSwapBuffers();

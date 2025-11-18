@@ -609,7 +609,6 @@ void Renderer::DrawWave()
 	glBindTexture(GL_TEXTURE_2D, m_RGBTexture);
 
 
-
 	glUniform4fv(glGetUniformLocation(shaderInt, "u_Points"),100, m_points);
 	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
 

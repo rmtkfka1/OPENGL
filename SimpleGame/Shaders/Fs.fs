@@ -7,7 +7,6 @@ uniform sampler2D u_RGBTexture;
 uniform float u_Time;
 layout(location=0) out vec4 FragColor;
 
-const vec2 texelSize = vec2(1.0/431.0, 1.0/432.0);
 
 //void main()
 //{
@@ -29,7 +28,7 @@ const vec2 texelSize = vec2(1.0/431.0, 1.0/432.0);
 
 //}
 
-void main()
+void test()
 {
     vec2 newUV = v_UV;
     float dx =0.1f * sin (v_UV.y * 6 * c_PI + u_Time);
@@ -40,29 +39,48 @@ void main()
 }
 
 
-//GPT
-/*void main()
+
+void circle()
 {
-    float kernel[9] = float[](
-        1.0/16, 2.0/16, 1.0/16,
-        2.0/16, 4.0/16, 2.0/16,
-        1.0/16, 2.0/16, 1.0/16
-    );
+    vec2 newUV = v_UV; // 0~1  ¿ÞÂÊÀ§ 0,0 
+    vec2 center = vec2(0.5, 0.5);
+    
+    float d = distance(newUV, center);
+    
+    vec4 newColor = vec4(0);
+    
+    float value = sin(4*c_PI*d*4 - 3*u_Time);
+    
+    newColor = vec4(value);
 
-    vec4 colorSum = vec4(0.0);
-    int index = 0;
+    FragColor = newColor;
+}
 
-    for (int y = -1; y <= 1; ++y)
+void Flag()
+{
+    vec2 newUV = vec2(v_UV.x, 1 - v_UV.y-0.5); // left bottom =(0,0) 
+    
+    vec4 newColor = vec4(0);
+    
+    float width = 0.2 * (1 - v_UV.x);
+    float sinValue = v_UV.x * 0.2f * sin(newUV.x * 2 * c_PI - u_Time);
+
+
+    if (newUV.y < sinValue + width && newUV.y > sinValue - width)
     {
-        for (int x = -1; x <= 1; ++x)
-        {
-            vec2 offset = vec2(float(x), float(y)) * texelSize;
-            vec4 sampleColor = texture(u_RGBTexture, v_UV + offset);
-            colorSum += sampleColor * kernel[index];
-            index++;
-        }
+        newColor = vec4(1);
     }
+    
+    FragColor = newColor;
+    
+    
+}
 
-    FragColor = colorSum;
-}*/
 
+
+void main()
+{
+    //circle();
+    Flag();
+
+}
