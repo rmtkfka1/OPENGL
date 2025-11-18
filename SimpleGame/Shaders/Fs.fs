@@ -56,31 +56,61 @@ void circle()
     FragColor = newColor;
 }
 
-void Flag()
+//void Flag()
+//{
+//    vec2 newUV = vec2(v_UV.x, 1 - v_UV.y-0.5); // left bottom =(0,0) 
+    
+//    vec4 newColor = vec4(0);
+    
+//    float width = 0.2 * (1 - v_UV.x);
+//    float sinValue = v_UV.x * 0.2f * sin(newUV.x * 2 * c_PI - u_Time);
+
+
+//    if (newUV.y < sinValue + width && newUV.y > sinValue - width)
+//    {
+//        newColor = vec4(1);
+//    }
+    
+//    FragColor = newColor;
+    
+    
+//}
+
+
+
+void Q1()
 {
-    vec2 newUV = vec2(v_UV.x, 1 - v_UV.y-0.5); // left bottom =(0,0) 
+    //그림그려보기
     
-    vec4 newColor = vec4(0);
-    
-    float width = 0.2 * (1 - v_UV.x);
-    float sinValue = v_UV.x * 0.2f * sin(newUV.x * 2 * c_PI - u_Time);
-
-
-    if (newUV.y < sinValue + width && newUV.y > sinValue - width)
-    {
-        newColor = vec4(1);
-    }
-    
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+    float x = newUV.x; //0~1
+    float y = 1-abs(2 * (v_UV.y - 0.5)); // 0 ~ 1 ~ 0
+    vec4 newColor = texture(u_RGBTexture, vec2(x, y));
+ 
     FragColor = newColor;
-    
-    
+   
 }
+
+void Q2()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+    float x = fract(newUV.x * 3); //0~1
+    float y = (2 - floor(newUV.x * 3)) / 3 + v_UV.y / 3;
+    vec4 newColor = texture(u_RGBTexture, vec2(x, y));
+ 
+    FragColor = newColor;
+   
+}
+
+
 
 
 
 void main()
 {
     //circle();
-    Flag();
+    //Flag();
+    Q2();
 
 }
