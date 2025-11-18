@@ -98,7 +98,6 @@ void Q2()
     float x = fract(newUV.x * 3); //0~1
     float y = (2 - floor(newUV.x * 3)) / 3 + v_UV.y / 3;
     vec4 newColor = texture(u_RGBTexture, vec2(x, y));
- 
     FragColor = newColor;
    
 }
