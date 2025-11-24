@@ -114,6 +114,18 @@ void Q3()
 }
 
 
+void Brick()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+    float x = fract(newUV.x * 2) + floor(newUV.y* 2)* 0.5 ; //0~1
+    float y = fract(newUV.y * 2); // 0~1 , 0~1 
+    vec4 newColor = texture(u_RGBTexture, vec2(x, y));
+    FragColor = newColor;
+   
+}
+
+
 //void my()
 //{
 //    //그림그려보기
@@ -131,6 +143,6 @@ void main()
     //circle();
     //Flag();
     //Q1();
-    Q3();
+    Brick();
 
 }
