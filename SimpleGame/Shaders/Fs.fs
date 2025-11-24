@@ -170,10 +170,7 @@ void Digit_Num()
     tx = tx * 0.2f + offX;
     ty = ty * 0.5f + offY;
 
-
     vec4 newColor = texture(u_NumTexture, vec2(tx,ty));
-
-
     FragColor = newColor;
 }
 
