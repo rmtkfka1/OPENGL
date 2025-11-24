@@ -4,6 +4,9 @@ in vec2 v_UV;
 
 const float c_PI=3.14f;
 uniform sampler2D u_RGBTexture;
+uniform sampler2D u_texture2;
+uniform sampler2D u_DigitTexture;
+uniform sampler2D u_NumTexture;
 uniform float u_Time;
 layout(location=0) out vec4 FragColor;
 
@@ -114,28 +117,65 @@ void Q3()
 }
 
 
-void Brick()
+void Brick_Horizental()
 {
     //그림그려보기
-    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
-    float x = fract(newUV.x * 2) + floor(newUV.y* 2)* 0.5 ; //0~1
-    float y = fract(newUV.y * 2); // 0~1 , 0~1 
+     vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+     float rCount=6.0f;
+     float sAmount =0.5f;
+
+    float x = fract(newUV.x * rCount)+floor(newUV.y* rCount+1)*sAmount; //0~1
+    float y = fract(newUV.y * rCount); // 0~1 , 0~1 
     vec4 newColor = texture(u_RGBTexture, vec2(x, y));
     FragColor = newColor;
    
 }
 
-
-//void my()
-//{
-//    //그림그려보기
-//    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
-//    float x = fract(5 *newUV.x);
-//    float y = (newUV.y/3.0f )+ 1/3.0f; 
-//    vec4 newColor = texture(u_RGBTexture, vec2(x, y));
-//    FragColor = newColor;
+void Brick_Vertical()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+    float x = fract(newUV.x * 2); //0~1
+    float y = fract(newUV.y * 2)+floor(newUV.x* 2)*0.5f; // 0~1 , 0~1 
+    vec4 newColor = texture(u_texture2, vec2(x, y));
+    FragColor = newColor;
    
-//}
+}
+
+void TestUV()
+{
+   //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+    vec4 newColor = texture(u_DigitTexture, newUV);
+    FragColor = newColor;
+}
+
+void Digit_Num()
+{
+   
+    float tx = v_UV.x;
+    float ty = v_UV.y;
+
+
+   // int digit = 0;
+   // float offX = digit-1;
+   // float offY = (digit/6); 
+
+    int digit = int(u_Time)%10;
+    int tileindex = (digit+9)%10;
+
+    float offX = float(tileindex%5)/5;
+    float offY = floor(float(tileindex)/5)/2; 
+
+    tx = tx * 0.2f + offX;
+    ty = ty * 0.5f + offY;
+
+
+    vec4 newColor = texture(u_NumTexture, vec2(tx,ty));
+
+
+    FragColor = newColor;
+}
 
 
 void main()
@@ -143,6 +183,7 @@ void main()
     //circle();
     //Flag();
     //Q1();
-    Brick();
-
+    //Brick_Horizental();
+    //TestUV();
+    Digit_Num();
 }

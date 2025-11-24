@@ -34,9 +34,7 @@ private:
 	void CreateGridMesh(int x, int y);
 
 
-	GLuint CreatePngTexture(char* filePath, GLuint samplingMethod);
 
-	GLuint m_RGBTexture{};
 
 	bool m_Initialized = false;
 	
@@ -78,7 +76,24 @@ private:
 
 	float m_points[100*4];
 
-	GLuint wave_texure{};
+
+	GLuint CreatePngTexture(char* filePath, GLuint samplingMethod);
+
+	GLuint m_RGBTexture{};
+	GLuint Texture2{};
+
+	GLuint m_0Texture{};
+	GLuint m_1Texture{};
+	GLuint m_2Texture{};
+	GLuint m_3Texture{};
+	GLuint m_4Texture{};
+	GLuint m_5Texture{};
+	GLuint m_6Texture{};
+	GLuint m_7Texture{};
+	GLuint m_8Texture{};
+	GLuint m_9Texture{};
+	GLuint m_AllTexture{};
+
 
 	
 };
