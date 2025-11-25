@@ -8,6 +8,7 @@ uniform sampler2D u_texture2;
 uniform sampler2D u_DigitTexture;
 uniform sampler2D u_NumTexture;
 uniform float u_Time;
+
 layout(location=0) out vec4 FragColor;
 
 
@@ -165,7 +166,7 @@ void Digit_Num()
     int tileindex = (digit+9)%10;
 
     float offX = float(tileindex%5)/5;
-    float offY = floor(float(tileindex)/5)/2; 
+    float offY = floor(tileindex/5.0f)/2; 
 
     tx = tx * 0.2f + offX;
     ty = ty * 0.5f + offY;

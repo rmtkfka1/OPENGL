@@ -23,6 +23,10 @@ public:
 	void DrawWave();
 	void DrawFs();
 	void DrawFullScreenColor(float r, float g, float b, float a);
+	void DrawTexture(float x, float y, float sx, float sy, GLuint TexID);
+	void DrawDebugTexture();
+	void DrawFBOs();
+
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
 	bool ReadFile(char* filename, std::string *target);
@@ -32,8 +36,7 @@ private:
 	void GetGLPosition(float x, float y, float *newX, float *newY);
 	void GenerateParticles(int numParticle);
 	void CreateGridMesh(int x, int y);
-
-
+	void CreateFBO();
 
 
 	bool m_Initialized = false;
@@ -94,6 +97,26 @@ private:
 	GLuint m_9Texture{};
 	GLuint m_AllTexture{};
 
+
+	GLuint m_TexVBO = 0;
+	GLuint m_TexShader = 0;
+
+	//FBO Color Buffers
+	GLuint m_RT[5]{};
+
+	//GLuint m_RTO = 0;
+	//GLuint m_RT1 = 0;
+	//GLuint m_RT2 = 0;
+	//GLuint m_RT3 = 0;
+	//GLuint m_RT4 = 0;
+
+	//FBOS
+	GLuint m_FBO[5]{};
+	//GLuint m_FBO0 = 0;
+	//GLuint m_FBO1 = 0;
+	//GLuint m_FBO2 = 0;
+	//GLuint m_FBO3 = 0;
+	//GLuint m_FBO4 = 0;
 
 	
 };
