@@ -544,15 +544,17 @@ void Renderer::CreateGridMesh(int x, int y)
 
 void Renderer::DrawFBOs()
 {
-	//Set FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[0]);
+	glViewport(0, 0, 512, 512);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawParticle();
+	DrawFs();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[1]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	DrawWave();
 
+	glViewport(0, 0, 512, 512);
 	//Restore FBO
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -560,50 +562,70 @@ void Renderer::DrawFBOs()
 
 void Renderer::CreateFBO()
 {
-	GLuint depthBuffer;
-	glGenRenderbuffers(1, &depthBuffer);
-	
 	for (int i = 0; i < 5; ++i)
 	{
 		glGenTextures(1, &m_RT[i]);
 		glBindTexture(GL_TEXTURE_2D, m_RT[i]);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+			512, 512, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-		//GenDepthBuffer
+
+		glGenTextures(1, &m_RT_1[i]);
+		glBindTexture(GL_TEXTURE_2D, m_RT_1[i]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+			512, 512, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+
+		GLuint depthBuffer;
+		glGenRenderbuffers(1, &depthBuffer);
+
 		glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+		glRenderbufferStorage(GL_RENDERBUFFER,
+			GL_DEPTH_COMPONENT24,
+			512, 512);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-		//GenFBO
+
 		glGenFramebuffers(1, &m_FBO[i]);
-
-		//Attach to FBO
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[i]);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RT[i], 0);
-		//GL_COLOR_ATTACHMENT0 0¹ø·»´õÅ¸°Ù°ú ¿¬°á
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER,
+			GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_2D,
+			m_RT[i], 0);
 
 
-		//Check
+		glFramebufferTexture2D(GL_FRAMEBUFFER,
+			GL_COLOR_ATTACHMENT1,
+			GL_TEXTURE_2D,
+			m_RT_1[i], 0);
+
+	
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT,
+			GL_RENDERBUFFER,
+			depthBuffer);
+
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
+			printf("FBO[%d] error: %x\n", i, status);
 			assert(false);
 		}
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	
-	
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-};
+}
 
 GLuint Renderer::CreatePngTexture(char* filePath, GLuint samplingMethod)
 {
@@ -636,11 +658,13 @@ void Renderer::DrawParticle()
 
 #define ShaderName m_ParticleShader
 
-
 	glUseProgram(ShaderName);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	GLenum DrawBuffers[2] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, DrawBuffers);
+
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glUniform1f(glGetUniformLocation(ShaderName, "u_radius"), 0.5f);
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
@@ -689,8 +713,7 @@ void Renderer::DrawParticle()
 	glDisableVertexAttribArray(attribColor);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-	glDisable(GL_BLEND);
+	//glDisable(GL_BLEND);
 
 }
 
@@ -725,6 +748,9 @@ void Renderer::DrawFs()
 	const int shaderInt = m_FSShader;
 	glUseProgram(shaderInt);
 
+	GLenum DrawBuffers[2] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, DrawBuffers);
+
 	glActiveTexture(GL_TEXTURE15);
 	glUniform1i(glGetUniformLocation(shaderInt, "u_RGBTexture"), 15);
 	glBindTexture(GL_TEXTURE_2D, m_RGBTexture);
@@ -735,8 +761,6 @@ void Renderer::DrawFs()
 	
 	int uDigitTextureLoc = glGetUniformLocation(shaderInt, "u_DigitTexture");
 	glUniform1i(uDigitTextureLoc, (int)floor(m_time)%10);
-
-
 
 	int uNumTextureLoc = glGetUniformLocation(shaderInt, "u_NumTexture");
 	glUniform1i(uNumTextureLoc, 10);
@@ -756,13 +780,11 @@ void Renderer::DrawFs()
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, m_4Texture);
 
-
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, m_5Texture);
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, m_6Texture);
-
 
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, m_7Texture);
@@ -775,8 +797,6 @@ void Renderer::DrawFs()
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, m_AllTexture);
-
-
 
 	glUniform1f(glGetUniformLocation(shaderInt, "u_Time"), m_time);
 
@@ -821,6 +841,8 @@ void Renderer::DrawTexture(float x, float y, float sx, float sy, GLuint TexID)
 
 
 
+	glUniform1f(glGetUniformLocation(shader, "u_Time"), m_time);
+
 	int uSize = glGetUniformLocation(shader, "u_Size");
 	glUniform2f(uSize, sx,sy);
 
@@ -848,9 +870,9 @@ void Renderer::DrawTexture(float x, float y, float sx, float sy, GLuint TexID)
 
 void Renderer::DrawDebugTexture()
 {
-	DrawTexture(-0.8f, -0.8f, 0.2f, 0.2f, m_RT[0]);
-	DrawTexture(-0.4f, -0.8f, 0.2f, 0.2f, m_RT[1]);
 
+	DrawTexture(0, 0, 1.0f, 1.0f, m_RT[0]);
+	//DrawTexture(0.5f, -0.5f, 0.5f, 0.5f, m_RT_1[0]);
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)

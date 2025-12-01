@@ -10,7 +10,7 @@ uniform sampler2D u_NumTexture;
 uniform float u_Time;
 
 layout(location=0) out vec4 FragColor;
-
+layout(location=1) out vec4 FragColor1;
 
 //void main()
 //{
@@ -32,7 +32,7 @@ layout(location=0) out vec4 FragColor;
 
 //}
 
-void test()
+vec4 test()
 {
     vec2 newUV = v_UV;
     float dx =0.1f * sin (v_UV.y * 6 * c_PI + u_Time);
@@ -40,11 +40,12 @@ void test()
     newUV += vec2(dx,dy);
     vec4 sampleColor = texture(u_RGBTexture,newUV);
     FragColor =sampleColor;
+    return FragColor;
 }
 
 
 
-void circle()
+vec4 circle()
 {
     vec2 newUV = v_UV; // 0~1  왼쪽위 0,0 
     vec2 center = vec2(0.5, 0.5);
@@ -58,9 +59,10 @@ void circle()
     newColor = vec4(value);
 
     FragColor = newColor;
+    return FragColor;
 }
 
-void Flag()
+vec4 Flag()
 {
     vec2 newUV = vec2(v_UV.x, 1 - v_UV.y-0.5); // left bottom =(0,0) 
     
@@ -76,13 +78,14 @@ void Flag()
     }
     
     FragColor = newColor;
+    return FragColor;
     
     
 }
 
 
 
-void Q1()
+vec4 Q1()
 {
     //그림그려보기
     
@@ -92,6 +95,7 @@ void Q1()
     vec4 newColor = texture(u_RGBTexture, vec2(x, y));
  
     FragColor = newColor;
+    return FragColor;
    
 }
 
@@ -106,7 +110,7 @@ void Q2()
    
 }
 
-void Q3()
+vec4 Q3()
 {
     //그림그려보기
     vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
@@ -114,11 +118,12 @@ void Q3()
     float y = (floor(newUV.x * 3)) / 3 + v_UV.y / 3;
     vec4 newColor = texture(u_RGBTexture, vec2(x, y));
     FragColor = newColor;
+    return FragColor;
    
 }
 
 
-void Brick_Horizental()
+vec4 Brick_Horizental()
 {
     //그림그려보기
      vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
@@ -129,10 +134,10 @@ void Brick_Horizental()
     float y = fract(newUV.y * rCount); // 0~1 , 0~1 
     vec4 newColor = texture(u_RGBTexture, vec2(x, y));
     FragColor = newColor;
-   
+    return FragColor;
 }
 
-void Brick_Vertical()
+vec4 Brick_Vertical()
 {
     //그림그려보기
     vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
@@ -140,23 +145,24 @@ void Brick_Vertical()
     float y = fract(newUV.y * 2)+floor(newUV.x* 2)*0.5f; // 0~1 , 0~1 
     vec4 newColor = texture(u_texture2, vec2(x, y));
     FragColor = newColor;
+    return FragColor;
    
 }
 
-void TestUV()
+vec4 TestUV()
 {
    //그림그려보기
     vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
     vec4 newColor = texture(u_DigitTexture, newUV);
     FragColor = newColor;
+    return FragColor;
 }
 
-void Digit_Num()
+vec4 Digit_Num()
 {
    
     float tx = v_UV.x;
     float ty = v_UV.y;
-
 
    // int digit = 0;
    // float offX = digit-1;
@@ -173,6 +179,7 @@ void Digit_Num()
 
     vec4 newColor = texture(u_NumTexture, vec2(tx,ty));
     FragColor = newColor;
+    return FragColor;
 }
 
 
@@ -183,5 +190,8 @@ void main()
     //Q1();
     //Brick_Horizental();
     //TestUV();
-    Digit_Num();
+
+    FragColor =  Digit_Num();
+    FragColor1=  vec4(1,0,0,0);
+
 }
