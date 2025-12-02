@@ -39,13 +39,9 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 	m_8Texture = CreatePngTexture("./8.png", GL_NEAREST);
 	m_9Texture = CreatePngTexture("./9.png", GL_NEAREST);
 	m_AllTexture = CreatePngTexture("./numbers.png", GL_NEAREST);
-	//glEnable(GL_CULL_FACE);       // 컬링 기능 켜기
-	// 
-	//glCullFace(GL_BACK);          // 어떤 면을 컬링할지 지정 (보통 BACK)
-	//glFrontFace(GL_CCW);          // 앞면의 정점 순서 (반시계 방향이 기본)
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	m_PariticleTexture = CreatePngTexture("./9.png", GL_NEAREST);
+	
 	m_Initialized = true;
-
 
 	int index = 0;
 	for (int i = 0; i < 100; ++i)
@@ -97,19 +93,7 @@ void Renderer::DeleteAllShaders()
 }
 
 void Renderer::CreateVertexBufferObjects()
-{
-	//float rect[]
-	//	=
-	//{
-	//	-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, -1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, //Triangle1
-	//	-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f,  1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, //Triangle2
-	//};
-
-	//glGenBuffers(1, &m_VBORect);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
-							
-							
+{		
 	{						
 		{
 			float temp = 0.5f;
@@ -548,11 +532,15 @@ void Renderer::DrawFBOs()
 	glViewport(0, 0, 512, 512);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	DrawFs();
+	DrawParticle();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_FBO[1]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	DrawWave();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_HDRFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawParticle();
 
 	glViewport(0, 0, 512, 512);
 	//Restore FBO
@@ -560,12 +548,38 @@ void Renderer::DrawFBOs()
 
 }
 
+void Renderer::DrawBloomParticle()
+
+{	//1.Render Particle Effect => HDR Texture
+	glViewport(0, 0, 512, 512);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_HDRFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	DrawParticle();
+
+	//2.Blur
+	glBindFramebuffer(GL_FRAMEBUFFER, m_PingpongFBO[0]);
+	DrawTexture(0, 0, 1, 1, m_HDRRT_1, 0, 1);
+
+	for (int i = 0; i < 20; ++i)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_PingpongFBO[1]);
+		DrawTexture(0, 0,1, 1, m_PingpongTexture[0], 0, 2);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_PingpongFBO[0]);
+		DrawTexture(0, 0, 1, 1, m_PingpongTexture[1], 0, 1);
+	}
+
+	glViewport(0, 0, 512, 512);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	DrawTexture(0, 0, 1, 1, m_HDRRT_0, m_PingpongTexture[0], 3);
+}
+
 void Renderer::CreateFBO()
 {
 	for (int i = 0; i < 5; ++i)
 	{
-		glGenTextures(1, &m_RT[i]);
-		glBindTexture(GL_TEXTURE_2D, m_RT[i]);
+		glGenTextures(1, &m_RT_0[i]);
+		glBindTexture(GL_TEXTURE_2D, m_RT_0[i]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -602,7 +616,7 @@ void Renderer::CreateFBO()
 		glFramebufferTexture2D(GL_FRAMEBUFFER,
 			GL_COLOR_ATTACHMENT0,
 			GL_TEXTURE_2D,
-			m_RT[i], 0);
+			m_RT_0[i], 0);
 
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER,
@@ -623,8 +637,95 @@ void Renderer::CreateFBO()
 			assert(false);
 		}
 
+	}
+
+	{
+
+		glGenTextures(1, &m_HDRRT_0);
+		glBindTexture(GL_TEXTURE_2D, m_HDRRT_0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,512, 512, 0,GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+
+		glGenTextures(1, &m_HDRRT_1);
+		glBindTexture(GL_TEXTURE_2D, m_HDRRT_1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F,512, 512, 0,GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+		GLuint depthBuffer;
+		glGenRenderbuffers(1, &depthBuffer);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER,
+			GL_DEPTH_COMPONENT24,
+			512, 512);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+
+		glGenFramebuffers(1, &m_HDRFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_HDRFBO);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER,
+			GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_2D,
+			m_HDRRT_0, 0);
+
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER,
+			GL_COLOR_ATTACHMENT1,
+			GL_TEXTURE_2D,
+			m_HDRRT_1, 0);
+
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+			GL_DEPTH_ATTACHMENT,
+			GL_RENDERBUFFER,
+			depthBuffer);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			assert(false);
+		}
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	}
+
+
+
+	{
+		glGenFramebuffers(2, m_PingpongFBO);
+		glGenTextures(2, m_PingpongTexture);
+		for (int i = 0; i < 2; i++)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, m_PingpongFBO[i]);
+			glBindTexture(GL_TEXTURE_2D, m_PingpongTexture[i]);
+			glTexImage2D(
+				GL_TEXTURE_2D, 0, GL_RGBA16F, 512, 512, 0, GL_RGBA, GL_FLOAT, NULL
+			);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PingpongTexture[i], 0);
+			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (status != GL_FRAMEBUFFER_COMPLETE)
+			{
+				std::cout << "fbo creation failed" << std::endl;
+			}
+		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
+
+
 }
 
 GLuint Renderer::CreatePngTexture(char* filePath, GLuint samplingMethod)
@@ -670,7 +771,13 @@ void Renderer::DrawParticle()
 	glUniform1f(glGetUniformLocation(ShaderName, "u_Time"), m_time);
 	glUniform3f(glGetUniformLocation(ShaderName, "u_Force"), 5, 0, 0);
 
-	int stride = sizeof(float) * 15;
+	glUniform1i(glGetUniformLocation(ShaderName, "u_Method"), 0);
+	glUniform1i(glGetUniformLocation(ShaderName, "u_Texture"), 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_PariticleTexture);
+
+
+	int stride = sizeof(float) * 17;
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBOParticle);
 
 	// Bind position attribute
@@ -695,7 +802,7 @@ void Renderer::DrawParticle()
 	glVertexAttribPointer(atrrubuteVelocity, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(float) * 9));
 
 	int atrrubuteLifeTime = glGetAttribLocation(ShaderName, "a_LifeTime");
-	glEnableVertexAttribArray(atrrubuteLifeTime);;
+	glEnableVertexAttribArray(atrrubuteLifeTime);
 	glVertexAttribPointer(atrrubuteLifeTime, 1, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(float) * 12));
 
 	int atrributeMass = glGetAttribLocation(ShaderName, "a_Mass");
@@ -705,6 +812,11 @@ void Renderer::DrawParticle()
 	int atrributePeriod = glGetAttribLocation(ShaderName, "a_Period");
 	glEnableVertexAttribArray(atrributePeriod);
 	glVertexAttribPointer(atrributePeriod, 1, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(float) * 14));
+
+	int aTexLoc = glGetAttribLocation(ShaderName, "a_Tex");
+	glEnableVertexAttribArray(aTexLoc);
+	glVertexAttribPointer(aTexLoc, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(float) * 15));
+
 	//// Draw 
 	glDrawArrays(GL_TRIANGLES, 0, m_VBOParticleVertexCount);
 
@@ -833,26 +945,31 @@ void Renderer::DrawFullScreenColor(float r, float g, float b, float a)
 	glDisable(GL_BLEND);
 }
 
-void Renderer::DrawTexture(float x, float y, float sx, float sy, GLuint TexID)
+void Renderer::DrawTexture(float x, float y, float sx, float sy, GLuint TexID, GLuint TexID1, GLuint Method)
 {
-
 	int shader = m_TexShader;
 	glUseProgram(shader);
-
-
 
 	glUniform1f(glGetUniformLocation(shader, "u_Time"), m_time);
 
 	int uSize = glGetUniformLocation(shader, "u_Size");
-	glUniform2f(uSize, sx,sy);
+	glUniform2f(uSize, sx, sy);
 
 	int uTran = glGetUniformLocation(shader, "u_Tran");
-	glUniform2f(uTran, x,y);
+	glUniform2f(uTran, x, y);
+
+	int methodLoc = glGetUniformLocation(shader, "u_Method");
+	glUniform1i(methodLoc,Method);
 
 	int uTex = glGetUniformLocation(shader, "u_TexID");
 	glUniform1i(uTex, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TexID);
+
+	int uTex2 = glGetUniformLocation(shader, "u_TexID1");
+	glUniform1i(uTex, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, TexID1);
 
 	int aPosition = glGetAttribLocation(shader, "a_Pos");
 	int aTex = glGetAttribLocation(shader, "a_Tex");
@@ -862,17 +979,18 @@ void Renderer::DrawTexture(float x, float y, float sx, float sy, GLuint TexID)
 	glBindBuffer(GL_ARRAY_BUFFER, m_TexVBO);
 
 	glVertexAttribPointer(aPosition, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-	glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float)*3));
+	glVertexAttribPointer(aTex, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (GLvoid*)(sizeof(float) * 3));
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
 }
+
+
 
 void Renderer::DrawDebugTexture()
 {
-
-	DrawTexture(0, 0, 1.0f, 1.0f, m_RT[0]);
-	//DrawTexture(0.5f, -0.5f, 0.5f, 0.5f, m_RT_1[0]);
+	/*DrawTexture(0, 0, 1.0f, 1.0f, m_HDRRT_0,0,0);*/
+	/*DrawTexture(-0.5f, -0.5f, 0.5f, 0.5f, m_HDRRT_1,0,0);
+	DrawTexture(0.5f, -0.5f, 0.5f, 0.5f, m_PingpongTexture[1], 0, 0);*/
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
@@ -883,7 +1001,7 @@ void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 
 void Renderer::GenerateParticles(int numParticle)
 {
-	 int floatCountPerVertex = 3 + 1 + 4 + 1 + 3 + 1 + 1 + 1 ; //x,y,z,value,r,g,b,a , startTime , vx,vy,vz , lifetime
+	 int floatCountPerVertex = 3 + 1 + 4 + 1 + 3 + 1 + 1 + 1 +2 ; //x,y,z,value,r,g,b,a , startTime , vx,vy,vz , lifetime
 	 int verticesCountPerParticle = 6; //2 triangles
 	 int floatCountPerParticle = floatCountPerVertex * verticesCountPerParticle;
 	 int totalVertexCount = verticesCountPerParticle * numParticle;
@@ -936,6 +1054,10 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
+		vertices[index] = 0;			index++;
+		vertices[index] = 1;			index++;
+
+
 		//v2
 		vertices[index] = x + size;		index++;
 		vertices[index] = y + size;		index++;
@@ -952,7 +1074,8 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
-
+		vertices[index] = 1;			index++;
+		vertices[index] = 0;			index++;
 
 		//v3
 		vertices[index] = x - size;		index++;
@@ -970,6 +1093,9 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
+		vertices[index] = 0;			index++;
+		vertices[index] = 0;			index++;
+
 		//v4
 		vertices[index] = x - size;		index++;
 		vertices[index] = y - size;		index++;
@@ -986,6 +1112,9 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
+		vertices[index] = 0;			index++;
+		vertices[index] = 1;			index++;
+
 		//v5
 		vertices[index] = x + size;		index++;
 		vertices[index] = y - size;		index++;
@@ -1002,6 +1131,8 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
+		vertices[index] = 1;			index++;
+		vertices[index] = 1;			index++;
 		//v6
 		vertices[index] = x + size;		index++;
 		vertices[index] = y + size;		index++;
@@ -1018,6 +1149,8 @@ void Renderer::GenerateParticles(int numParticle)
 		vertices[index] = lifeTime;		index++;
 		vertices[index] = mass;			index++;
 		vertices[index] = period;		index++;
+		vertices[index] = 1;			index++;
+		vertices[index] = 0;			index++;
 	}
 
 	glGenBuffers(1, &m_VBOParticle);

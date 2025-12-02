@@ -10,12 +10,16 @@ in float a_Period;
 in vec3 a_Vel;
 out vec4 v_Color;
 
+in vec2 a_Tex;
+out vec2 v_UV;
+
 uniform float u_radius;
 uniform float u_Time;
 uniform vec3 u_Force;
 
 const float pi = 3.141592f;
 const float c_G = -9.8f;
+
 
 void raining()
 {
@@ -121,5 +125,7 @@ void CircleParticle()
 void main()
 {
 	CircleParticle();
+
+	v_UV = a_Tex;
 
 };

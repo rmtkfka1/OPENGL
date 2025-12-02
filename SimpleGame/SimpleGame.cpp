@@ -33,14 +33,15 @@ void RenderScene(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//g_Renderer->DrawFullScreenColor(0, 0, 0, 0.3f);
-	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 300, 1, 1, 1, 1);
 	//g_Renderer->DrawTestRect();
 	//g_Renderer->DrawParticle();
 	//g_Renderer->DrawWave();
 	/*g_Renderer->DrawFs();*/
 	//g_Renderer->DrawTexture(-0.5,0.5,0.5,0.5,0);
-	g_Renderer->DrawFBOs();
+
+	//g_Renderer->DrawFBOs();
+	g_Renderer->DrawBloomParticle();
 	g_Renderer->DrawDebugTexture();
 	glutSwapBuffers();
 }

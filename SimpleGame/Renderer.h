@@ -23,9 +23,11 @@ public:
 	void DrawWave();
 	void DrawFs();
 	void DrawFullScreenColor(float r, float g, float b, float a);
-	void DrawTexture(float x, float y, float sx, float sy, GLuint TexID);
+	void DrawTexture(float x, float y, float sx, float sy, GLuint TexID , GLuint TexID1 , GLuint Method);
+
 	void DrawDebugTexture();
 	void DrawFBOs();
+	void DrawBloomParticle();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -102,13 +104,19 @@ private:
 	GLuint m_TexShader = 0;
 
 	//FBO Color Buffers
-	GLuint m_RT[5]{};
+	GLuint m_RT_0[5]{};
 	GLuint m_RT_1[5]{};
-
-	
 	//FBOS
 	GLuint m_FBO[5]{};
 
+	GLuint m_HDRRT_0 = 0;
+	GLuint m_HDRRT_1 = 0;
+	GLuint m_HDRFBO = 0;
+	GLuint m_PariticleTexture = 0;
+
+
+	GLuint m_PingpongFBO[2]{};
+	GLuint m_PingpongTexture[2]{};
 
 	
 };
