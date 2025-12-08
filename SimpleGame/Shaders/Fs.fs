@@ -113,6 +113,71 @@ void Q3()
    
 }
 
+void testing()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+
+    
+    newUV.y = 1-abs(2 * (v_UV.y - 0.5)); // 0 ~ 1 ~ 0
+
+    vec4 newColor = texture(u_RGBTexture,newUV);
+    FragColor = newColor;
+   
+}
+
+void testing2()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+
+    newUV.x = fract(3.0f * v_UV.x);
+    newUV.y = (2-floor(3.0f * v_UV.x))/3.0f + v_UV.y/3.f;
+
+    vec4 newColor = texture(u_RGBTexture,newUV);
+    FragColor = newColor;
+   
+}
+
+void testing3()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+
+    newUV.x =fract(2.0f*v_UV.x) + (floor(2.0f * v_UV.y)+1)*0.5f;
+    newUV.y =fract(2.0f*v_UV.y);
+
+    vec4 newColor = texture(u_RGBTexture,newUV);
+    FragColor = newColor;
+   
+}
+
+
+void testing4()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+
+    newUV.x =newUV.x;
+    newUV.y = (2-floor(v_UV.y*3.0f))/3.0f + fract(v_UV.y*3.0f)/3.0f;
+
+    vec4 newColor = texture(u_RGBTexture,newUV);
+    FragColor = newColor;
+   
+}
+
+void testing5()
+{
+    //그림그려보기
+    vec2 newUV = vec2(v_UV.x, v_UV.y); // left bottom =(0,0) right Top = (1,1);
+
+    newUV.x =fract(2.0f*newUV.x);
+    newUV.y =fract(2.0f*newUV.y)+fract((floor(2*v_UV.x))*0.5f);
+
+    vec4 newColor = texture(u_RGBTexture,newUV);
+    FragColor = newColor;
+   
+}
 
 //void my()
 //{
@@ -131,6 +196,6 @@ void main()
     //circle();
     //Flag();
     //Q1();
-    Q3();
+    testing3();
 
 }
